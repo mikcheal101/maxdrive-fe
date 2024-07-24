@@ -26,7 +26,7 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
-  min-width: 320px;
+  min-width: 70vh;
   min-height: 100vh;
 }
 
@@ -65,4 +65,31 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+.toolbar {
+  border: 1px solid #ededed;
+  background-color: #fcfcfc;
+}
+
+div.content {
+  border: 1px solid #ededed;
+  min-height: 80vh !important;
+}
+
+div.content:focus {
+  outline: 1px solid #cbcbcb !important;
+}
+
+div#content {
+  height: 80vh;
+  width: 100%;
+}
+
+div#content:focus {
+  outline: none !important;
+}
+
+a {
+  cursor: pointer;
 }

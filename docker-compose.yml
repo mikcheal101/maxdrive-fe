@@ -1,0 +1,12 @@
+services:
+  max-fe:
+    build: .
+    container_name: maxFe
+    ports:
+      - 3000:80
+    networks:
+      - maxNetwork
+
+networks:
+  maxNetwork:
+    driver: bridge
