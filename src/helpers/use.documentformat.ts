@@ -1,16 +1,17 @@
-import { ChangeEvent, FormEvent, MouseEvent, RefObject } from "react";
+import { ChangeEvent, FormEvent, MouseEvent, RefObject, useEffect } from "react";
 import { FormatCommand, TextState } from ".";
 import AppService from "../services/app.service";
 
 interface IUseDocumentFormat {
     id: string | null;
-    updateForm: Function;
+    updateForm:  Function;
     setTextState: Function;
-    setTextContent: Function;
+    setData: Function;
     contentRef:  RefObject<HTMLDivElement>;
 };
 
 const UseDocumentFormat = (params: IUseDocumentFormat) => {
+
 
     const formatDocument = (
         event:
@@ -67,17 +68,13 @@ const UseDocumentFormat = (params: IUseDocumentFormat) => {
     };
 
     const fetchContent = (uuid: string | null) => {
-        console.log(`fetchContent called: ${uuid}`);
-        const queryData = setInterval(async () => {
-            console.log(`queryData: ${uuid}`);
 
-            if (uuid != null) {
-                console.log(`uuid: ${uuid}`);
+        const queryData = setInterval(async () => {
+            if (uuid !== null) {
                 const _content: string | null = await AppService.getDocumentContent(uuid);
 
-                console.log("_content: ", _content);
-                if (_content) {
-                    params.setTextContent(_content);
+                if (_content !== null) {
+                    params.setData(_content);
                 }
             }
         }, 5000);

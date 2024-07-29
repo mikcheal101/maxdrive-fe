@@ -11,6 +11,9 @@ import { TextState } from "./helpers";
 import Toolbar from "./components/toolbar";
 import UseDocumentApi from "./helpers/use.documentapi";
 import UseDocumentFormat from "./helpers/use.documentformat";
+import UseSearchParams, { __APP_URI } from "./helpers/use.searchparams";
+import UseMouse from "./helpers/use.mouse";
+// import { useSearchParams } from "react-router-dom";
 
 const App = () => {
   const [textState, setTextState] = useState<TextState>(TextState.HTML);
@@ -24,44 +27,61 @@ const App = () => {
   );
 
   const [textContent, setTextContent] = useState<string | null>("");
-
   const updateTextContent = () => {
     if (contentRef.current) {
+      let text: string | null = textContent;
       switch (textState) {
         case TextState.HTML:
-          setTextContent(contentRef.current.innerHTML);
+          text = contentRef.current.innerHTML;
           break;
         case TextState.PlainText:
         default:
-          setTextContent(contentRef.current.innerText);
+          text = contentRef.current.innerText;
           break;
       }
+      setTextContent(text.trim());
     }
   };
 
-  const { updateForm, saveContent, _socket_api, commitContent } = UseDocumentApi({
+  const { updateForm, saveContent, commitContent } = UseDocumentApi({
     id,
     setId,
     textContent,
     updateTextContent,
-    socketUrl
+    socketUrl,
   });
+
+  const [expected_data, setData] = useState<string | null>(null);
+  // const [searchParams, setSearchParams] = UseSearchParams<ISearchParams>();
+  const { setCursorToEnd } = UseMouse();
 
   const { addUrl, showCode, fetchContent, formatDocument } = UseDocumentFormat({
     id,
     contentRef,
-    setTextContent,
     setTextState,
     updateForm,
+    setData,
   });
 
+  const updateIdAndParams = () => {
+    if (__APP_URI.searchParams && __APP_URI.searchParams.has("id")) {
+      setId(__APP_URI.searchParams.get("id"));
+    }
+  };
+
   useEffect(() => {
-    commitContent();
+    updateIdAndParams();
   }, []);
 
   useEffect(() => {
     if (id !== null) {
       fetchContent(id);
+
+      // update the url if there is no id in the url
+      if (!__APP_URI.searchParams.has("id")) {
+        __APP_URI.searchParams.append("id", id);
+        history.pushState({}, "", __APP_URI.href);
+      }
     }
   }, [id]);
 
@@ -70,15 +90,12 @@ const App = () => {
   }, [textState]);
 
   useEffect(() => {
-    if (id != null && id.trim().length > 0) {
-      const currentUri: string = window.location.origin;
-      window.history.replaceState(
-        null,
-        `Note - ${id}`,
-        `${currentUri}/?id=${id}`
-      );
+    if (contentRef && contentRef.current && expected_data) {
+      contentRef.current.innerHTML =
+        contentRef.current.innerText = `${expected_data}`;
+      setCursorToEnd(contentRef.current);
     }
-  }, [id]);
+  }, [expected_data]);
 
   return (
     <>

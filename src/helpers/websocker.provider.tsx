@@ -5,6 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import WebMessage from "./web.message";
 
 export interface IWebSocketContext {
   sendMessage: (message: any) => void;
@@ -47,18 +48,18 @@ const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, []);
 
-  const sendMessage = (message: any) => {
+  const sendMessage = (message: WebMessage) => {
     if (ws.current) {
       ws.current.send(JSON.stringify(message));
     }
   };
 
   const undo = (_id: string) => {
-    sendMessage({ id: _id, type: "undo" });
+    sendMessage({ id: _id, type: "undo", message: "" });
   };
 
   const redo = (_id: string) => {
-    sendMessage({ id: _id, type: "redo" });
+    sendMessage({ id: _id, type: "redo", message: "" });
   };
 
   return (

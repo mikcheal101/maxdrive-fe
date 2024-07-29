@@ -5,6 +5,7 @@ import {
     useState,
 } from "react";
 import { useWebSocketApi } from "./websocker.provider";
+import WebMessage from "./web.message";
 
 interface IParam {
     id: string | null;
@@ -55,19 +56,20 @@ const UseDocumentApi = (params: IParam) => {
         if (!updatingForm) {
             saveForm(true);
             params.updateTextContent();
-
-            if (params.textContent != null && params.textContent.length > 0) {
+            
+            if (params.textContent && params.textContent !== null && params.textContent.length > 0) {
                 if (params.id == null) {
                     const newId: string | null = await AppService.createNewDocument();
 
-                    if (newId != null) {
+                    if (newId !== null) {
                         params.setId(newId);
                     }
                 } else {
                     // Send content across WebSocket
-                    const data: { id: string; message: string } = {
+                    const data: WebMessage = {
                         id: params.id,
                         message: params.textContent,
+                        type: "edit",
                     };
 
                     const data_s: string = JSON.stringify(data);
